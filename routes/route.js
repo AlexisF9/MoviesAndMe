@@ -1,15 +1,19 @@
 import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
-import Home from '../components/home';
+import filmDetails from '../components/filmDetails';
 import Search from '../components/search';
 
 const screens = {
-    Home: {
-        screen: Home
-    },
     Search: {
-        screen: Search
+        screen: Search,
+        navigationOptions: {
+            title: 'Rechercher'
+        }
+    },
+    filmDetails: {
+        screen: filmDetails
     }
+
 }
 
 const route = createStackNavigator(screens);
