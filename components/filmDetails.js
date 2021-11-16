@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image } from 'react-native';
+import { StyleSheet, View, Text, ActivityIndicator, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { getFilmDetailFromApi, getImageFromApi } from '../API/TMDBApi'
 import moment from 'moment'
 import numeral from 'numeral'
@@ -35,6 +35,11 @@ class FilmDetail extends React.Component {
                     source={{uri: getImageFromApi(film.backdrop_path)}}
                 />
                 <Text style={styles.title_text}>{film.title}</Text>
+                <TouchableOpacity
+                  style={styles.favorite_container}
+                  onPress={() => this._toggleFavorite()}>
+                  {this._displayFavoriteImage()}
+                </TouchableOpacity>
                 <Text style={styles.description_text}>{film.overview}</Text>
                 <Text style={styles.default_text}>Sorti le {moment(new Date(film.release_date)).format('DD/MM/YYYY')}</Text>
                 <Text style={styles.default_text}>Note : {film.vote_average} / 10</Text>
@@ -51,6 +56,24 @@ class FilmDetail extends React.Component {
                 </ScrollView>
             )
         }
+    }
+
+    _toggleFavorite() {
+      const action = { type: "TOGGLE_FAVORITE", value: this.state.film }
+      this.props.dispatch(action)
+    }
+
+    _displayFavoriteImage() {
+      var sourceImage = require('../assets/favoris-off.png')
+      if (this.props.favoritesFilm.findIndex(item => item.id === this.state.film.id) !== -1) {
+        sourceImage = require('../assets/favoris-on.png')
+      }
+      return (
+        <Image
+          style={styles.favorite_image}
+          source={sourceImage}
+        />
+      )
     }
 
     componentDidMount() { // s'execute une fois le composant monté (donc apres le constructor et le render)
@@ -114,6 +137,9 @@ class FilmDetail extends React.Component {
       marginLeft: 5,
       marginRight: 5,
       marginTop: 5,
+    },
+    favorite_container: {
+      alignItems: 'center', 
     }
   })
   
@@ -122,5 +148,11 @@ class FilmDetail extends React.Component {
         favoritesFilm: state.favoritesFilm // on map que la liste de films favoris pour éviter de mapper tout le state
     }
   }
+
+  const mapDispatchToProps = (dispatch) => {
+    return {
+      dispatch: (action) => { dispatch(action) }
+    }
+  }
   
-  export default connect(mapStateToProps)(FilmDetail)
+  export default connect(mapStateToProps, mapDispatchToProps)(FilmDetail)
